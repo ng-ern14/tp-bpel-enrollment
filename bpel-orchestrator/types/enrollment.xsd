@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Messages exchanged between the student client and the EnrollmentProcess.
+     Local elements are unqualified, like in the partner WSDLs, so that the
+     XPath expressions of the BPEL stay short ($request.payload/amount ...). -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:tns="http://tp.bpel/enrollment/"
+            targetNamespace="http://tp.bpel/enrollment/">
+
+    <xsd:complexType name="Student">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="program" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="enrollRequest">
+        <xsd:complexType><xsd:sequence>
+            <xsd:element name="student" type="tns:Student"/>
+            <!-- tuition fees in FCFA -->
+            <xsd:element name="amount" type="xsd:decimal"/>
+        </xsd:sequence></xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="enrollResponse">
+        <xsd:complexType><xsd:sequence>
+            <!-- ENROLLED or REFUSED -->
+            <xsd:element name="status" type="xsd:string"/>
+            <xsd:element name="studentId" type="xsd:string"/>
+            <xsd:element name="roomNumber" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="passId" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="receipt" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="message" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence></xsd:complexType>
+    </xsd:element>
+</xsd:schema>

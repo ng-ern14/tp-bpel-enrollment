@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="91a49451-7a6e-46ec-a986-944b7c66b0b1" activeEnvironment="Default" name="enrollment-tests" soapui-version="5.7.2" xmlns:con="http://eviware.com/soapui/config"><con:description>TP BPEL - student enrollment : partner services and EnrollmentProcess (ODE)</con:description><con:settings/><con:interface xsi:type="con:WsdlInterface" id="fe6e2bdd-ccc0-4cd9-bc7a-fe4c8b8ffbd3" wsaVersion="NONE" name="EnrollmentSOAP" type="wsdl" bindingName="{http://tp.bpel/enrollment/}EnrollmentSOAP" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/ode/processes/EnrollmentService?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/ode/processes/EnrollmentService?wsdl"><con:part><con:url>http://localhost:8080/ode/processes/EnrollmentService?wsdl</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="http://tp.bpel/enrollment/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://tp.bpel/enrollment/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl">
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified">
+      <xsd:import namespace="http://tp.bpel/enrollment/" schemaLocation="EnrollmentService?xsd=enrollment.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="enrollIn">
+    <wsdl:part name="payload" element="tns:enrollRequest"/>
+  </wsdl:message>
+  <wsdl:message name="enrollOut">
+    <wsdl:part name="payload" element="tns:enrollResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="EnrollmentServicePortType">
+    <wsdl:operation name="enroll">
+      <wsdl:input message="tns:enrollIn" wsaw:Action="enroll"/>
+      <wsdl:output message="tns:enrollOut" wsaw:Action="http://tp.bpel/enrollment/EnrollmentPT/enrollResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="EnrollmentSOAP" type="tns:EnrollmentServicePortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <wsdl:operation name="enroll">
+      <soap:operation soapAction="enroll" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EnrollmentService">
+    <wsdl:port name="EnrollmentPort" binding="tns:EnrollmentSOAP">
+      <soap:address location="http://localhost:8080/ode/processes/EnrollmentService.EnrollmentPort/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://localhost:8080/ode/processes/EnrollmentService?xsd=enrollment.xsd</con:url><con:content><![CDATA[<xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://tp.bpel/enrollment/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://tp.bpel/enrollment/">
+  <xsd:complexType name="Student">
+    <xsd:sequence>
+      <xsd:element name="name" type="xsd:string"/>
+      <xsd:element name="program" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="enrollRequest">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="student" type="tns:Student"/>
+        <xsd:element name="amount" type="xsd:decimal"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="enrollResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="status" type="xsd:string"/>
+        <xsd:element name="studentId" type="xsd:string"/>
+        <xsd:element minOccurs="0" name="roomNumber" type="xsd:string"/>
+        <xsd:element minOccurs="0" name="passId" type="xsd:string"/>
+        <xsd:element minOccurs="0" name="receipt" type="xsd:string"/>
+        <xsd:element minOccurs="0" name="message" type="xsd:string"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/ode/processes/EnrollmentService.EnrollmentPort/</con:endpoint></con:endpoints><con:operation id="35799f35-4c6c-4db8-9058-2da4979e8155" isOneWay="false" action="enroll" name="enroll" bindingOperationName="enroll" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false"><con:settings/></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="4ac53350-430c-4cb1-b94f-3c5ebbb1b6dd" wsaVersion="NONE" name="UniversitySOAP" type="wsdl" bindingName="{http://tp.bpel/university/}UniversitySOAP" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/university-service/UniversityService?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/university-service/UniversityService?wsdl"><con:part><con:url>http://localhost:8080/university-service/UniversityService?wsdl</con:url><con:content><![CDATA[<definitions name="UniversityService" targetNamespace="http://tp.bpel/university/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://tp.bpel/university/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema targetNamespace="http://tp.bpel/university/">
+      <xsd:complexType name="Student">
+        <xsd:sequence>
+          <xsd:element name="name" type="xsd:string"/>
+          <xsd:element name="program" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="registerRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="student" type="tns:Student"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="registerResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="studentId" type="xsd:string"/>
+            <xsd:element name="status" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="cancelRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="studentId" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="reason" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getStudentRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="studentId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getStudentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="studentId" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="student" type="tns:Student"/>
+            <xsd:element name="status" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="registerIn">
+    <part element="tns:registerRequest" name="payload"></part>
+  </message>
+  <message name="registerOut">
+    <part element="tns:registerResponse" name="payload"></part>
+  </message>
+  <message name="cancelIn">
+    <part element="tns:cancelRequest" name="payload"></part>
+  </message>
+  <message name="getStudentIn">
+    <part element="tns:getStudentRequest" name="payload"></part>
+  </message>
+  <message name="getStudentOut">
+    <part element="tns:getStudentResponse" name="payload"></part>
+  </message>
+  <portType name="UniversityPT">
+    <operation name="register">
+      <input message="tns:registerIn"></input>
+      <output message="tns:registerOut"></output>
+    </operation>
+    <operation name="cancel">
+      <input message="tns:cancelIn"></input>
+    </operation>
+    <operation name="getStudent">
+      <input message="tns:getStudentIn"></input>
+      <output message="tns:getStudentOut"></output>
+    </operation>
+  </portType>
+  <binding name="UniversitySOAP" type="tns:UniversityPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="register">
+      <soap:operation soapAction="register"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="cancel">
+      <soap:operation soapAction="cancel"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+    </operation>
+    <operation name="getStudent">
+      <soap:operation soapAction="getStudent"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="UniversityService">
+    <port binding="tns:UniversitySOAP" name="UniversityPort">
+      <soap:address location="http://localhost:8080/university-service/UniversityService"/>
+    </port>
+  </service>
+  <plnk:partnerLinkType name="UniversityLT">
+    <plnk:role name="uniProvider" portType="tns:UniversityPT"/>
+  </plnk:partnerLinkType>
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/university-service/UniversityService</con:endpoint></con:endpoints><con:operation id="d347ee16-cbbb-4d23-b949-926a497f55b6" isOneWay="false" action="cancel" name="cancel" bindingOperationName="cancel" type="One-Way" inputName="" sendsAttachments="false"><con:settings/></con:operation><con:operation id="0182136c-72c5-42d8-9d1d-9293cce63ab9" isOneWay="false" action="getStudent" name="getStudent" bindingOperationName="getStudent" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false"><con:settings/></con:operation><con:operation id="207b05f8-282d-44d5-b11f-933fb934ac8f" isOneWay="false" action="register" name="register" bindingOperationName="register" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false"><con:settings/></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="ee494ba8-6449-4872-9be8-c961c02b74ac" wsaVersion="NONE" name="BankSOAP" type="wsdl" bindingName="{http://tp.bpel/bank/}BankSOAP" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/bank-service/BankService?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/bank-service/BankService?wsdl"><con:part><con:url>http://localhost:8080/bank-service/BankService?wsdl</con:url><con:content><![CDATA[<definitions name="BankService" targetNamespace="http://tp.bpel/bank/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://tp.bpel/bank/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema targetNamespace="http://tp.bpel/bank/">
+      <xsd:element name="payRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="studentId" type="xsd:string"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="payResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="approved" type="xsd:boolean"/>
+            <xsd:element name="receipt" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="payOut">
+    <part element="tns:payResponse" name="payload"></part>
+  </message>
+  <message name="payIn">
+    <part element="tns:payRequest" name="payload"></part>
+  </message>
+  <portType name="BankPT">
+    <operation name="pay">
+      <input message="tns:payIn"></input>
+      <output message="tns:payOut"></output>
+    </operation>
+  </portType>
+  <binding name="BankSOAP" type="tns:BankPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="pay">
+      <soap:operation soapAction="pay"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="BankService">
+    <port binding="tns:BankSOAP" name="BankPort">
+      <soap:address location="http://localhost:8080/bank-service/BankService"/>
+    </port>
+  </service>
+  <plnk:partnerLinkType name="BankLT">
+    <plnk:role name="bankProvider" portType="tns:BankPT"/>
+  </plnk:partnerLinkType>
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/bank-service/BankService</con:endpoint></con:endpoints><con:operation id="62e1d066-5932-4c08-a835-bb5d4b1718a5" isOneWay="false" action="pay" name="pay" bindingOperationName="pay" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false"><con:settings/></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="0628fd06-6ce5-4dfc-a384-4f134a525b97" wsaVersion="NONE" name="ResidenceSOAP" type="wsdl" bindingName="{http://tp.bpel/residence/}ResidenceSOAP" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/residence-service/ResidenceService?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/residence-service/ResidenceService?wsdl"><con:part><con:url>http://localhost:8080/residence-service/ResidenceService?wsdl</con:url><con:content><![CDATA[<definitions name="ResidenceService" targetNamespace="http://tp.bpel/residence/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://tp.bpel/residence/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema targetNamespace="http://tp.bpel/residence/">
+      <xsd:element name="assignRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="studentId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="assignResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="studentId" type="xsd:string"/>
+            <xsd:element name="roomNumber" type="xsd:string"/>
+            <xsd:element name="building" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="assignIn">
+    <part element="tns:assignRequest" name="payload"></part>
+  </message>
+  <message name="assignOut">
+    <part element="tns:assignResponse" name="payload"></part>
+  </message>
+  <portType name="ResidencePT">
+    <operation name="assignRoom">
+      <input message="tns:assignIn"></input>
+      <output message="tns:assignOut"></output>
+    </operation>
+  </portType>
+  <binding name="ResidenceSOAP" type="tns:ResidencePT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="assignRoom">
+      <soap:operation soapAction="assignRoom"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="ResidenceService">
+    <port binding="tns:ResidenceSOAP" name="ResidencePort">
+      <soap:address location="http://localhost:8080/residence-service/ResidenceService"/>
+    </port>
+  </service>
+  <plnk:partnerLinkType name="ResidenceLT">
+    <plnk:role name="resProvider" portType="tns:ResidencePT"/>
+  </plnk:partnerLinkType>
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/residence-service/ResidenceService</con:endpoint></con:endpoints><con:operation id="a56646b9-f6a9-4b6d-8286-187de36d9c8d" isOneWay="false" action="assignRoom" name="assignRoom" bindingOperationName="assignRoom" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false"><con:settings/></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="c5320952-d97d-47b4-885e-dde5dc230b2f" wsaVersion="NONE" name="TransportSOAP" type="wsdl" bindingName="{http://tp.bpel/transport/}TransportSOAP" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/transport-service/TransportService?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/transport-service/TransportService?wsdl"><con:part><con:url>http://localhost:8080/transport-service/TransportService?wsdl</con:url><con:content><![CDATA[<definitions name="TransportService" targetNamespace="http://tp.bpel/transport/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://tp.bpel/transport/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema targetNamespace="http://tp.bpel/transport/">
+      <xsd:element name="activateRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="studentId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="activateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="studentId" type="xsd:string"/>
+            <xsd:element name="passId" type="xsd:string"/>
+            <xsd:element name="validUntil" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="activateOut">
+    <part element="tns:activateResponse" name="payload"></part>
+  </message>
+  <message name="activateIn">
+    <part element="tns:activateRequest" name="payload"></part>
+  </message>
+  <portType name="TransportPT">
+    <operation name="activatePass">
+      <input message="tns:activateIn"></input>
+      <output message="tns:activateOut"></output>
+    </operation>
+  </portType>
+  <binding name="TransportSOAP" type="tns:TransportPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="activatePass">
+      <soap:operation soapAction="activatePass"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="TransportService">
+    <port binding="tns:TransportSOAP" name="TransportPort">
+      <soap:address location="http://localhost:8080/transport-service/TransportService"/>
+    </port>
+  </service>
+  <plnk:partnerLinkType name="TransportLT">
+    <plnk:role name="trnProvider" portType="tns:TransportPT"/>
+  </plnk:partnerLinkType>
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/transport-service/TransportService</con:endpoint></con:endpoints><con:operation id="7f9cc5ce-9604-4a76-8e57-9996520d1a72" isOneWay="false" action="activatePass" name="activatePass" bindingOperationName="activatePass" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false"><con:settings/></con:operation></con:interface><con:testSuite id="db28a618-16f9-4001-bbb1-3f16224b0630" name="EnrollmentTestSuite"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="5d04a649-ec3e-4422-8738-e9dfc60a3587" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC1 - Partner services respond" searchProperties="true"><con:settings/><con:testStep type="request" id="922df1c3-ade2-4f8e-a2a2-014c8b69776e" name="Bank pay 350000"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>BankSOAP</con:interface><con:operation>pay</con:operation><con:request name="Bank pay 350000" id="b83a983a-7c54-4b38-875e-5ba1b49dcd03"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/bank-service/BankService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:bnk="http://tp.bpel/bank/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <bnk:payRequest>
+         <studentId>STU-TEST</studentId>
+         <amount>350000</amount>
+      </bnk:payRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="8b82e114-bf0b-4892-b4a3-1320226e7426" name="SOAP Response"/><con:assertion type="SOAP Fault Assertion" id="70afd025-a0ed-4eac-b47b-1688f1ffb2cc" name="Not SOAP Fault"/><con:assertion type="XPath Match" id="0180dcc3-b2d4-45ac-bc1f-c7f7ce3efd15" name="approved is true"><con:configuration><path>//approved</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:wsaConfig action="pay"/></con:request></con:config></con:testStep><con:testStep type="request" id="6bd38502-e151-4dc2-8393-48702a0f11ac" name="Residence assignRoom"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>ResidenceSOAP</con:interface><con:operation>assignRoom</con:operation><con:request name="Residence assignRoom" id="850eaf15-6962-45a4-9fda-47cc5ad2f981"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/residence-service/ResidenceService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:res="http://tp.bpel/residence/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <res:assignRequest>
+         <studentId>STU-TEST</studentId>
+      </res:assignRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="69e8b09f-6422-417f-9834-a8bbe9c3b1cc" name="SOAP Response"/><con:assertion type="SOAP Fault Assertion" id="1a587eb3-21e4-412c-a04c-314685b6966a" name="Not SOAP Fault"/><con:assertion type="XPath Match" id="4d53281f-5937-4437-8eff-ab39135a8b4d" name="studentId echoed"><con:configuration><path>//studentId</path><content>STU-TEST</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:wsaConfig action="assignRoom"/></con:request></con:config></con:testStep><con:testStep type="request" id="f2b83c17-85bb-4f10-a81e-73462a4d4163" name="Transport activatePass"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>TransportSOAP</con:interface><con:operation>activatePass</con:operation><con:request name="Transport activatePass" id="88e10cbf-fb38-4ae5-8536-407374c60698"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/transport-service/TransportService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:trn="http://tp.bpel/transport/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <trn:activateRequest>
+         <studentId>STU-TEST</studentId>
+      </trn:activateRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="b8b726b2-85c6-43b4-a61e-34269ecf367c" name="SOAP Response"/><con:assertion type="SOAP Fault Assertion" id="9cfef43e-a4bd-4691-bf9c-6b6ccc091ea5" name="Not SOAP Fault"/><con:assertion type="Simple Contains" id="cee250dc-04e3-4545-940b-cd63ada4911d" name="pass id returned"><con:configuration><token>PASS-</token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:wsaConfig action="activatePass"/></con:request></con:config></con:testStep><con:testStep type="request" id="796ddaf4-2638-443e-968b-eea07ac691b5" name="University register"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>UniversitySOAP</con:interface><con:operation>register</con:operation><con:request name="University register" id="28b52522-89de-41dd-b710-6055252a00aa"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/university-service/UniversityService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:uni="http://tp.bpel/university/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <uni:registerRequest>
+         <student>
+            <name>Carol</name>
+            <program>ISI4</program>
+         </student>
+      </uni:registerRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="68d97810-49c2-43f3-85de-b9bf956759d8" name="SOAP Response"/><con:assertion type="SOAP Fault Assertion" id="607b120e-c7a0-476d-ad5e-94e311ddfda4" name="Not SOAP Fault"/><con:assertion type="XPath Match" id="5d5077a5-0887-4c8d-b853-55f6b9f3c981" name="status REGISTERED"><con:configuration><path>//status</path><content>REGISTERED</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:wsaConfig action="register"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="04f7ef6a-cac3-4a52-8c57-b5d31881218e" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC2 - Bank refuses 900000" searchProperties="true"><con:settings/><con:testStep type="request" id="0e0275f8-3948-484e-855c-e647057fdda6" name="Bank pay 900000"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>BankSOAP</con:interface><con:operation>pay</con:operation><con:request name="Bank pay 900000" id="692c9faf-a199-4df7-b5e7-deaea2b2056a"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/bank-service/BankService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:bnk="http://tp.bpel/bank/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <bnk:payRequest>
+         <studentId>STU-TEST</studentId>
+         <amount>900000</amount>
+      </bnk:payRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="ae601eee-6092-4de5-b12e-54d09982283e" name="SOAP Response"/><con:assertion type="SOAP Fault Assertion" id="eab6a665-a027-4454-83e5-fa9ce41a13b6" name="Not SOAP Fault"/><con:assertion type="XPath Match" id="11c34e0f-1beb-4be9-8e54-49e5fb9c3c3c" name="approved is false"><con:configuration><path>//approved</path><content>false</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="e7a2812f-84f7-4935-a26d-b93fd5214b2d" name="no receipt"><con:configuration><path>//receipt</path><content>N/A</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:wsaConfig action="pay"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="9916fe31-c734-4036-8fb3-355c6b844b46" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC3 - Enrollment 350000 ENROLLED" searchProperties="true"><con:settings/><con:testStep type="request" id="d34e2b49-792c-4872-b38d-7b6691084fdd" name="enroll 350000"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EnrollmentSOAP</con:interface><con:operation>enroll</con:operation><con:request name="enroll 350000" id="98473486-efaf-4fc4-a4cc-0cd5c4e053db"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/ode/processes/EnrollmentService.EnrollmentPort/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:enr="http://tp.bpel/enrollment/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <enr:enrollRequest>
+         <student>
+            <name>Alice</name>
+            <program>ISI4</program>
+         </student>
+         <amount>350000</amount>
+      </enr:enrollRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="f10f0be5-0f3e-449b-a390-eb29f05ea318" name="SOAP Response"/><con:assertion type="SOAP Fault Assertion" id="dddfcbaa-2a66-4524-98c0-90a23e4c4ca2" name="Not SOAP Fault"/><con:assertion type="XPath Match" id="51e52cf1-3653-4fc4-9286-301ae18b321a" name="status ENROLLED"><con:configuration><path>//status</path><content>ENROLLED</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="e43601a2-cec7-4ab1-b6b3-7b388534834f" name="room assigned"><con:configuration><path>boolean(string-length(//roomNumber) > 0)</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="3d9563e6-b1c9-4a7c-85c9-0e178af4837c" name="pass activated"><con:configuration><path>starts-with(//passId, 'PASS-')</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="46ecf5a5-b8f7-4645-a75a-2e3b7972be04" name="receipt present"><con:configuration><path>starts-with(//receipt, 'RCT-')</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:wsaConfig action="enroll"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="a78823b5-3a78-4707-90cf-48342911e8c3" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC4 - Enrollment 900000 REFUSED and compensated" searchProperties="true"><con:settings/><con:testStep type="request" id="a5c59ab1-0975-4993-bcc1-f39d4591f023" name="enroll 900000"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EnrollmentSOAP</con:interface><con:operation>enroll</con:operation><con:request name="enroll 900000" id="a23b5be9-4660-4faf-a5f2-6dd9c5f56769"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/ode/processes/EnrollmentService.EnrollmentPort/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:enr="http://tp.bpel/enrollment/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <enr:enrollRequest>
+         <student>
+            <name>Bob</name>
+            <program>ISI4</program>
+         </student>
+         <amount>900000</amount>
+      </enr:enrollRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="c71e7130-0afc-4a53-894a-9b7681f915e8" name="SOAP Response"/><con:assertion type="SOAP Fault Assertion" id="aa04308e-1b32-40e0-81ae-8b9ea86c15c3" name="Not SOAP Fault"/><con:assertion type="XPath Match" id="a618ada1-a699-4ca7-8420-97ae75c13610" name="status REFUSED"><con:configuration><path>//status</path><content>REFUSED</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:wsaConfig action="enroll"/></con:request></con:config></con:testStep><con:testStep type="transfer" name="Transfer studentId" id="08c13449-ca39-46bd-a09e-665872b69606"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true"><con:name>studentId</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>enroll 900000</con:sourceStep><con:sourcePath>//studentId</con:sourcePath><con:targetType>Request</con:targetType><con:targetStep>University getStudent</con:targetStep><con:targetPath>declare namespace uni='http://tp.bpel/university/'; //uni:getStudentRequest/studentId</con:targetPath><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="request" id="2e67adf5-45fb-42dd-a489-4ecba6fc0e48" name="University getStudent"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>UniversitySOAP</con:interface><con:operation>getStudent</con:operation><con:request name="University getStudent" id="863101c1-7ec9-41e8-bf41-13a1d57c4283"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/university-service/UniversityService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:uni="http://tp.bpel/university/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <uni:getStudentRequest>
+         <studentId>?</studentId>
+      </uni:getStudentRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="83910da0-db1e-4930-b41b-6b2dcb83cfc1" name="SOAP Response"/><con:assertion type="SOAP Fault Assertion" id="fb32c100-6ce6-42a7-a6f9-99706592657a" name="Not SOAP Fault"/><con:assertion type="XPath Match" id="264260a4-4fbe-4b22-8b99-ad1c7dd4c425" name="registration cancelled"><con:configuration><path>//status</path><content>CANCELLED</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:wsaConfig action="getStudent"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="990fb6ac-2805-43a2-a7d7-ecbe622a6b40" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC5 - Second student gets another id" searchProperties="true"><con:settings/><con:testStep type="request" id="f4c0faee-7f59-45e0-8290-cd750ab28561" name="enroll David 120000"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EnrollmentSOAP</con:interface><con:operation>enroll</con:operation><con:request name="enroll David 120000" id="ec9929f4-f427-4a81-a760-df6b028390e0"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/ode/processes/EnrollmentService.EnrollmentPort/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:enr="http://tp.bpel/enrollment/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <enr:enrollRequest>
+         <student>
+            <name>David</name>
+            <program>ISI4</program>
+         </student>
+         <amount>120000</amount>
+      </enr:enrollRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="256b863a-6c37-44b1-8f6e-a128e037e691" name="SOAP Response"/><con:assertion type="SOAP Fault Assertion" id="e1caa1e7-cdf2-4271-b8df-cdb62cefa428" name="Not SOAP Fault"/><con:assertion type="XPath Match" id="5c774b16-fcce-44ee-a197-fe15bb094f81" name="status ENROLLED"><con:configuration><path>//status</path><content>ENROLLED</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="Simple Contains" id="09aca415-467d-4998-9f66-fdd0b81f93ad" name="student id format"><con:configuration><token>STU-</token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:wsaConfig action="enroll"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>

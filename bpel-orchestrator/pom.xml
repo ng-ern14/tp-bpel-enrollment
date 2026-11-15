@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Builds the folder that ODE expects in WEB-INF/processes :
+     target/enrollment = BPEL + process WSDL + XSD + deploy.xml + the 4 partner
+     WSDLs (taken from the service modules, so there is only one copy of each
+     contract in the sources). A zip of the same folder is also produced. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>tp.bpel</groupId>
+        <artifactId>tp-bpel-enrollment</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>bpel-orchestrator</artifactId>
+    <packaging>pom</packaging>
+    <name>Enrollment BPEL process (Apache ODE)</name>
+
+    <properties>
+        <ode.package>${project.build.directory}/enrollment</ode.package>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-process</id>
+                        <phase>process-resources</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${ode.package}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}</directory>
+                                    <includes>
+                                        <include>EnrollmentProcess.bpel</include>
+                                        <include>EnrollmentProcess.wsdl</include>
+                                        <include>deploy.xml</include>
+                                        <include>types/*.xsd</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/../services/university-service/src/main/resources</directory>
+                                    <includes><include>*.wsdl</include></includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/../services/bank-service/src/main/resources</directory>
+                                    <includes><include>*.wsdl</include></includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/../services/residence-service/src/main/resources</directory>
+                                    <includes><include>*.wsdl</include></includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/../services/transport-service/src/main/resources</directory>
+                                    <includes><include>*.wsdl</include></includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>zip-process</id>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                        <configuration>
+                            <descriptors><descriptor>${basedir}/assembly.xml</descriptor></descriptors>
+                            <finalName>enrollment</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

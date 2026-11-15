@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- University partner service : registers a student, cancels a registration
+     (used for the compensation) and gives the current state of a student. -->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:tns="http://tp.bpel/university/"
+             xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+             targetNamespace="http://tp.bpel/university/"
+             name="UniversityService">
+
+    <types>
+        <xsd:schema targetNamespace="http://tp.bpel/university/">
+            <xsd:complexType name="Student">
+                <xsd:sequence>
+                    <xsd:element name="name" type="xsd:string"/>
+                    <xsd:element name="program" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:element name="registerRequest">
+                <xsd:complexType><xsd:sequence>
+                    <xsd:element name="student" type="tns:Student"/>
+                </xsd:sequence></xsd:complexType>
+            </xsd:element>
+            <xsd:element name="registerResponse">
+                <xsd:complexType><xsd:sequence>
+                    <xsd:element name="studentId" type="xsd:string"/>
+                    <xsd:element name="status" type="xsd:string"/>
+                </xsd:sequence></xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="cancelRequest">
+                <xsd:complexType><xsd:sequence>
+                    <xsd:element name="studentId" type="xsd:string"/>
+                    <xsd:element name="reason" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence></xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="getStudentRequest">
+                <xsd:complexType><xsd:sequence>
+                    <xsd:element name="studentId" type="xsd:string"/>
+                </xsd:sequence></xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getStudentResponse">
+                <xsd:complexType><xsd:sequence>
+                    <xsd:element name="studentId" type="xsd:string"/>
+                    <xsd:element name="student" type="tns:Student" minOccurs="0"/>
+                    <xsd:element name="status" type="xsd:string"/>
+                </xsd:sequence></xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </types>
+
+    <message name="registerIn"><part name="payload" element="tns:registerRequest"/></message>
+    <message name="registerOut"><part name="payload" element="tns:registerResponse"/></message>
+    <message name="cancelIn"><part name="payload" element="tns:cancelRequest"/></message>
+    <message name="getStudentIn"><part name="payload" element="tns:getStudentRequest"/></message>
+    <message name="getStudentOut"><part name="payload" element="tns:getStudentResponse"/></message>
+
+    <portType name="UniversityPT">
+        <operation name="register">
+            <input message="tns:registerIn"/>
+            <output message="tns:registerOut"/>
+        </operation>
+        <!-- one-way operation (no output), called by the compensation handler -->
+        <operation name="cancel">
+            <input message="tns:cancelIn"/>
+        </operation>
+        <operation name="getStudent">
+            <input message="tns:getStudentIn"/>
+            <output message="tns:getStudentOut"/>
+        </operation>
+    </portType>
+
+    <plnk:partnerLinkType name="UniversityLT">
+        <plnk:role name="uniProvider" portType="tns:UniversityPT"/>
+    </plnk:partnerLinkType>
+
+    <binding name="UniversitySOAP" type="tns:UniversityPT">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="register">
+            <soap:operation soapAction="register"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="cancel">
+            <soap:operation soapAction="cancel"/>
+            <input><soap:body use="literal"/></input>
+        </operation>
+        <operation name="getStudent">
+            <soap:operation soapAction="getStudent"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+    </binding>
+
+    <service name="UniversityService">
+        <port name="UniversityPort" binding="tns:UniversitySOAP">
+            <soap:address location="http://localhost:8080/university-service/UniversityService"/>
+        </port>
+    </service>
+</definitions>

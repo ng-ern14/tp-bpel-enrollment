@@ -1,0 +1,17 @@
+# Transport event adapter
+spring:
+  application:
+    name: transport-event-adapter
+  main:
+    web-application-type: none      # no HTTP server, the adapter only uses JMS
+  artemis:
+    mode: native
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+  jms:
+    pub-sub-domain: true            # destinations are topics (multicast addresses)
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [transport] %-5level %msg%n"

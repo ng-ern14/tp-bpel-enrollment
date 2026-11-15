@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  EnrollmentProcess - Part A (orchestration)
+
+  1. receive the enrollment request of the student
+  2. register the student at the university   (scope RegisterStudent, compensable)
+  3. ask the bank to collect the tuition fees
+  4. if the payment is approved : residence and transport in parallel (flow)
+     else : throw tns:paymentRefused
+  5. reply ENROLLED to the student
+
+  The process fault handler catches tns:paymentRefused, compensates the
+  RegisterStudent scope (the university cancels the registration) and
+  replies REFUSED to the student. The client always gets one single response.
+
+  Note on the <literal> blocks : each one starts with xmlns="" because in this
+  file the default namespace is the BPEL one. Without it the children
+  (studentId, amount ...) would be in the BPEL namespace and the XPath
+  $payReq.payload/studentId would select nothing (selectionFailure).
+-->
+<process name="EnrollmentProcess"
+         targetNamespace="http://tp.bpel/enrollment/"
+         xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:tns="http://tp.bpel/enrollment/"
+         xmlns:uni="http://tp.bpel/university/"
+         xmlns:bnk="http://tp.bpel/bank/"
+         xmlns:res="http://tp.bpel/residence/"
+         xmlns:trn="http://tp.bpel/transport/"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <!-- the partner WSDLs are copied next to the process by Maven (see pom.xml) -->
+    <import location="EnrollmentProcess.wsdl" namespace="http://tp.bpel/enrollment/"
+            importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <import location="university.wsdl" namespace="http://tp.bpel/university/"
+            importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <import location="bank.wsdl" namespace="http://tp.bpel/bank/"
+            importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <import location="residence.wsdl" namespace="http://tp.bpel/residence/"
+            importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <import location="transport.wsdl" namespace="http://tp.bpel/transport/"
+            importType="http://schemas.xmlsoap.org/wsdl/"/>
+
+    <partnerLinks>
+        <partnerLink name="client"     partnerLinkType="tns:EnrollmentLT" myRole="enrollmentProvider"/>
+        <partnerLink name="university" partnerLinkType="uni:UniversityLT" partnerRole="uniProvider"/>
+        <partnerLink name="bank"       partnerLinkType="bnk:BankLT"       partnerRole="bankProvider"/>
+        <partnerLink name="residence"  partnerLinkType="res:ResidenceLT"  partnerRole="resProvider"/>
+        <partnerLink name="transport"  partnerLinkType="trn:TransportLT"  partnerRole="trnProvider"/>
+    </partnerLinks>
+
+    <variables>
+        <variable name="request"   messageType="tns:enrollIn"/>
+        <variable name="response"  messageType="tns:enrollOut"/>
+        <variable name="uniReq"    messageType="uni:registerIn"/>
+        <variable name="uniResp"   messageType="uni:registerOut"/>
+        <variable name="cancelReq" messageType="uni:cancelIn"/>
+        <variable name="payReq"    messageType="bnk:payIn"/>
+        <variable name="payResp"   messageType="bnk:payOut"/>
+        <variable name="resReq"    messageType="res:assignIn"/>
+        <variable name="resResp"   messageType="res:assignOut"/>
+        <variable name="trnReq"    messageType="trn:activateIn"/>
+        <variable name="trnResp"   messageType="trn:activateOut"/>
+    </variables>
+
+    <!-- ===================== fault handling ===================== -->
+    <faultHandlers>
+        <catch faultName="tns:paymentRefused">
+            <sequence name="RefusedPath">
+                <!-- undo the registration done in the scope RegisterStudent -->
+                <compensateScope target="RegisterStudent"/>
+
+                <assign name="BuildRefusedResponse">
+                    <copy>
+                        <from>
+                            <literal>
+                                <tns:enrollResponse xmlns="">
+                                    <status/><studentId/><message/>
+                                </tns:enrollResponse>
+                            </literal>
+                        </from>
+                        <to variable="response" part="payload"/>
+                    </copy>
+                    <copy><from>'REFUSED'</from><to>$response.payload/status</to></copy>
+                    <copy><from>$uniResp.payload/studentId</from><to>$response.payload/studentId</to></copy>
+                    <copy>
+                        <from>'Payment refused by the bank, the registration has been cancelled'</from>
+                        <to>$response.payload/message</to>
+                    </copy>
+                </assign>
+                <reply partnerLink="client" portType="tns:EnrollmentPT" operation="enroll"
+                       variable="response"/>
+            </sequence>
+        </catch>
+    </faultHandlers>
+
+    <!-- ===================== main flow ===================== -->
+    <sequence name="Main">
+
+        <!-- 1. receive the student request -->
+        <receive name="ReceiveEnrollment" partnerLink="client" portType="tns:EnrollmentPT"
+                 operation="enroll" variable="request" createInstance="yes"/>
+
+        <!-- 2. register at the university. The scope has a compensation
+                handler : once the scope is completed, the registration can be
+                undone by calling the one-way operation cancel. -->
+        <scope name="RegisterStudent">
+            <compensationHandler>
+                <sequence>
+                    <assign name="PrepareCancel">
+                        <copy>
+                            <from>
+                                <literal>
+                                    <uni:cancelRequest xmlns=""><studentId/><reason/></uni:cancelRequest>
+                                </literal>
+                            </from>
+                            <to variable="cancelReq" part="payload"/>
+                        </copy>
+                        <copy><from>$uniResp.payload/studentId</from><to>$cancelReq.payload/studentId</to></copy>
+                        <copy><from>'PAYMENT_REFUSED'</from><to>$cancelReq.payload/reason</to></copy>
+                    </assign>
+                    <invoke name="CancelRegistration" partnerLink="university" portType="uni:UniversityPT"
+                            operation="cancel" inputVariable="cancelReq"/>
+                </sequence>
+            </compensationHandler>
+
+            <sequence>
+                <assign name="PrepareRegister">
+                    <copy>
+                        <from>
+                            <literal>
+                                <uni:registerRequest xmlns=""><student><name/><program/></student></uni:registerRequest>
+                            </literal>
+                        </from>
+                        <to variable="uniReq" part="payload"/>
+                    </copy>
+                    <copy><from>$request.payload/student/name</from><to>$uniReq.payload/student/name</to></copy>
+                    <copy><from>$request.payload/student/program</from><to>$uniReq.payload/student/program</to></copy>
+                </assign>
+                <invoke name="RegisterAtUniversity" partnerLink="university" portType="uni:UniversityPT"
+                        operation="register" inputVariable="uniReq" outputVariable="uniResp"/>
+            </sequence>
+        </scope>
+
+        <!-- 3. attempt to collect the tuition fees -->
+        <assign name="PreparePayment">
+            <copy>
+                <from>
+                    <literal>
+                        <bnk:payRequest xmlns=""><studentId/><amount/></bnk:payRequest>
+                    </literal>
+                </from>
+                <to variable="payReq" part="payload"/>
+            </copy>
+            <copy><from>$uniResp.payload/studentId</from><to>$payReq.payload/studentId</to></copy>
+            <copy><from>$request.payload/amount</from><to>$payReq.payload/amount</to></copy>
+        </assign>
+        <invoke name="PayTuition" partnerLink="bank" portType="bnk:BankPT" operation="pay"
+                inputVariable="payReq" outputVariable="payResp"/>
+
+        <!-- 4. branch on the payment result.
+                string() is used on purpose : in XPath 1.0 a node compared to
+                true() is converted with boolean(node), which is true as soon
+                as the node exists, even when its text is "false". -->
+        <if name="PaymentApproved">
+            <condition>string($payResp.payload/approved) = 'true'</condition>
+
+            <!-- 4.a payment OK : residence and transport in parallel -->
+            <flow name="ResidenceAndTransport">
+                <sequence name="ResidenceBranch">
+                    <assign name="PrepareRoom">
+                        <copy>
+                            <from><literal><res:assignRequest xmlns=""><studentId/></res:assignRequest></literal></from>
+                            <to variable="resReq" part="payload"/>
+                        </copy>
+                        <copy><from>$uniResp.payload/studentId</from><to>$resReq.payload/studentId</to></copy>
+                    </assign>
+                    <invoke name="AssignRoom" partnerLink="residence" portType="res:ResidencePT"
+                            operation="assignRoom" inputVariable="resReq" outputVariable="resResp"/>
+                </sequence>
+                <sequence name="TransportBranch">
+                    <assign name="PreparePass">
+                        <copy>
+                            <from><literal><trn:activateRequest xmlns=""><studentId/></trn:activateRequest></literal></from>
+                            <to variable="trnReq" part="payload"/>
+                        </copy>
+                        <copy><from>$uniResp.payload/studentId</from><to>$trnReq.payload/studentId</to></copy>
+                    </assign>
+                    <invoke name="ActivatePass" partnerLink="transport" portType="trn:TransportPT"
+                            operation="activatePass" inputVariable="trnReq" outputVariable="trnResp"/>
+                </sequence>
+            </flow>
+
+            <!-- 4.b payment refused : the fault handler does the compensation -->
+            <else>
+                <throw name="ThrowPaymentRefused" faultName="tns:paymentRefused"/>
+            </else>
+        </if>
+
+        <!-- 5. build and return the final response -->
+        <assign name="BuildEnrolledResponse">
+            <copy>
+                <from>
+                    <literal>
+                        <tns:enrollResponse xmlns="">
+                            <status/><studentId/><roomNumber/><passId/><receipt/>
+                        </tns:enrollResponse>
+                    </literal>
+                </from>
+                <to variable="response" part="payload"/>
+            </copy>
+            <copy><from>'ENROLLED'</from><to>$response.payload/status</to></copy>
+            <copy><from>$uniResp.payload/studentId</from><to>$response.payload/studentId</to></copy>
+            <copy><from>$resResp.payload/roomNumber</from><to>$response.payload/roomNumber</to></copy>
+            <copy><from>$trnResp.payload/passId</from><to>$response.payload/passId</to></copy>
+            <copy><from>$payResp.payload/receipt</from><to>$response.payload/receipt</to></copy>
+        </assign>
+        <reply name="ReplyEnrolled" partnerLink="client" portType="tns:EnrollmentPT"
+               operation="enroll" variable="response"/>
+    </sequence>
+</process>
