@@ -32,10 +32,8 @@ tp-bpel-enrollment/
 │   ├── university-event-adapter/ also closes the enrollment (aggregator)
 │   ├── bank-event-adapter/
 │   ├── residence-event-adapter/
-│   ├── transport-event-adapter/
-│   └── scripts/                  create-topics.sh, send-enrollment.sh, client-listen.sh
+│   └── transport-event-adapter/
 ├── soapui/enrollment-tests.xml   SoapUI project (5 test cases)
-├── scripts/deploy-part-a.sh      copies the WARs and the process into Tomcat
 └── report/                       final PDF report
 ```
 
@@ -74,8 +72,17 @@ unpacked, then deploy the services and the process :
 
 ```bash
 $TOMCAT_HOME/bin/catalina.bat run          # in its own terminal
-TOMCAT_HOME=/path/to/apache-tomcat-9.0.98 ./scripts/deploy-part-a.sh
+
+# the 4 partner services
+cp services/*/target/*-service.war $TOMCAT_HOME/webapps/
+
+# the BPEL process (ODE hot-deploys every folder of WEB-INF/processes)
+cp -r bpel-orchestrator/target/enrollment $TOMCAT_HOME/webapps/ode/WEB-INF/processes/
 ```
+
+ODE writes `enrollment.deployed` next to the folder when the process is
+deployed. To redeploy a new version, delete the `enrollment` folder first,
+wait until `enrollment.deployed` disappears, then copy it again.
 
 Checks :
 
@@ -108,8 +115,11 @@ curl -H "Content-Type: text/xml" -H 'SOAPAction: "enroll"' \
 artemis create ~/artemis-broker --user admin --password admin --allow-anonymous
 ~/artemis-broker/bin/artemis run                       # in its own terminal
 
-# topics
-BROKER_HOME=~/artemis-broker ./choreography/scripts/create-topics.sh
+# topics (the lab sheet lists 4, RoomAssigned and PassActivated are used
+# by the interaction contract)
+for t in EnrollmentRequested StudentRegistered PaymentDecided RoomAssigned PassActivated EnrollmentCompleted; do
+  ~/artemis-broker/bin/artemis address create --name $t --multicast --user admin --password admin --silent
+done
 
 # the 4 adapters, one terminal each
 cd choreography/university-event-adapter && mvn spring-boot:run
@@ -117,11 +127,21 @@ cd choreography/bank-event-adapter       && mvn spring-boot:run
 cd choreography/residence-event-adapter  && mvn spring-boot:run
 cd choreography/transport-event-adapter  && mvn spring-boot:run
 
-# the client : one terminal listens to EnrollmentCompleted ...
-BROKER_HOME=~/artemis-broker ./choreography/scripts/client-listen.sh
-# ... and another one publishes the requests
-./choreography/scripts/send-enrollment.sh enr-001 Alice 350000
-./choreography/scripts/send-enrollment.sh enr-002 Bob 900000
+# the client : one terminal listens to EnrollmentCompleted
+~/artemis-broker/bin/artemis consumer --destination topic://EnrollmentCompleted \
+  --message-count 100 --verbose --user admin --password admin
+```
+
+The request is published from another terminal with one curl command
+(change `enr-001`, the name and the amount for the next one, for example
+`enr-002`, `Bob`, `900000` for a refused payment) :
+
+```bash
+curl -u admin:admin -H "Content-Type: application/json" -H "Origin: http://localhost:8161" \
+  -XPOST http://localhost:8161/console/jolokia/ -d '{"type":"exec",
+  "mbean":"org.apache.activemq.artemis:broker=\"0.0.0.0\",component=addresses,address=\"EnrollmentRequested\"",
+  "operation":"sendMessage(java.util.Map,int,java.lang.String,boolean,java.lang.String,java.lang.String)",
+  "arguments":[{},3,"{\"correlationId\":\"enr-001\",\"type\":\"EnrollmentRequested\",\"data\":{\"student\":{\"name\":\"Alice\",\"program\":\"ISI4\"},\"amount\":\"350000\"}}",false,"admin","admin"]}'
 ```
 
 The Artemis console is at http://localhost:8161/console (admin / admin).
@@ -130,8 +150,9 @@ Notes :
 
 - The REST URL of the lab sheet (`/api/rest/queue/...`) answers 404 on
   Artemis 2.33, the REST interface is not part of the broker anymore.
-  `send-enrollment.sh` uses the Jolokia API of the console
-  (`sendMessage` operation of the address), it is still one curl command.
+  The curl above uses the Jolokia API of the console instead
+  (`sendMessage` operation of the address, 3 = text message), it is still
+  one curl command.
 - On the test machine port 5672 was already used by RabbitMQ, so the `amqp`
   acceptor (5672) is commented in `etc/broker.xml` of the broker instance.
   AMQP is still accepted on 61616.
